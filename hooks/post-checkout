@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Path to your dotfiles repository
+DOTFILES_PATH=~/MR-5OBOT/DotRoboT
+
+# Destination directories
+DESTINATIONS=("~/.config" "~/" "~/.mozilla/firefox/xbugllrt.default-release")
+
+# Function to check if a file exists and is a symlink
+function is_symlink() {
+ if [[ -h $1 ]]; then
+    return 0
+ else
+    return 1
+ fi
+}
+
+# Iterate over each destination directory
+for dest in "${DESTINATIONS[@]}"; do
+ if [[ -d $dest ]]; then
+     # Iterate over each file in the destination directory
+     for file in $(ls $dest); do
+         # If the file is a symlink
+         if is_symlink "$dest/$file"; then
+             # And the corresponding file exists in the current branch
+             if [[ -e $DOTFILES_PATH/$file ]]; then
+               # Forcefully recreate the symlink
+               ln -sf $DOTFILES_PATH/$file $dest/$file
+             fi
+         fi
+     done
+ fi
+done
+
